@@ -720,3 +720,89 @@ def query_blob(cmd, client, query_expression, input_config=None, output_config=N
         return None
 
     return reader.readall().decode("utf-8")
+
+
+def create_acl_policy(cmd, client, container_name, policy_name, start=None, expiry=None, permission=None, **kwargs):
+    """Create a stored access policy on the containing object"""
+    t_access_policy = cmd.get_models('#AccessPolicy')
+
+    acl = _get_acl(client, **kwargs)
+    public_access = None
+    if hasattr(acl, 'public_access'):
+        public_access = getattr(acl, 'public_access')
+
+    signed_identifiers = {}
+    for key, value in acl.items():
+        if key == "signed_identifiers":
+            for identifier in value:
+                signed_identifiers[identifier.id] = identifier.access_policy
+    signed_identifiers[policy_name] = t_access_policy(permission, expiry, start)
+
+    return _set_acl(client, signed_identifiers, public_access, **kwargs)
+
+
+def get_acl_policy(cmd, client, container_name, policy_name, **kwargs):
+    """Show a stored access policy on a containing object"""
+    acl = _get_acl(client, **kwargs)
+    for identifier in acl["signed_identifiers"]:
+        if identifier.id == policy_name:
+            return identifier
+    return None
+
+
+def list_acl_policies(cmd, client, container_name, **kwargs):
+    """List stored access policies on a containing object"""
+    return _get_acl(client, **kwargs)
+
+
+def set_acl_policy(cmd, client, container_name, policy_name, start=None, expiry=None, permission=None, **kwargs):
+    """Set a stored access policy on a containing object"""
+    if not (start or expiry or permission):
+        from knack.util import CLIError
+        raise CLIError('Must specify at least one property when updating an access policy.')
+
+    acl = _get_acl(client, **kwargs)
+    found = False
+    signed_identifiers = {}
+    for identifier in acl["signed_identifiers"]:
+        if identifier.id == policy_name:
+            policy = identifier.access_policy
+            policy.start = start or policy.start
+            policy.expiry = expiry or policy.expiry
+            policy.permission = permission or policy.permission
+            public_access = None
+            found = True
+            signed_identifiers[identifier.id] = policy
+        else:
+            signed_identifiers[identifier.id] = identifier.access_policy
+    if hasattr(acl, 'public_access'):
+        public_access = getattr(acl, 'public_access')
+    if not found:
+        from knack.util import CLIError
+        raise CLIError('ACL does not contain {}'.format(policy_name))
+    return _set_acl(client, signed_identifiers, public_access, **kwargs)
+
+
+def delete_acl_policy(cmd, client, container_name, policy_name, **kwargs):
+    """ Delete a stored access policy on a containing object """
+    acl = _get_acl(client, **kwargs)
+    public_access = None
+    if hasattr(acl, 'public_access'):
+        kwargs['public_access'] = getattr(acl, 'public_access')
+
+    signed_identifiers = {}
+    for key, value in acl.items():
+        if key == "signed_identifiers":
+            for identifier in value:
+                signed_identifiers[identifier.id] = identifier.access_policy
+    del signed_identifiers[policy_name]
+
+    return _set_acl(client, signed_identifiers, public_access, **kwargs)
+
+
+def _get_acl(client, **kwargs):
+    return client.get_container_access_policy(**kwargs)
+
+
+def _set_acl(client, signed_identifiers, public_access, **kwargs):
+    return client.set_container_access_policy(signed_identifiers=signed_identifiers, public_access=public_access, **kwargs)

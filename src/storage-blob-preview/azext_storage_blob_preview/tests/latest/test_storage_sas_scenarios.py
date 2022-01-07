@@ -93,14 +93,14 @@ class StorageSASScenario(StorageScenarioMixin, LiveScenarioTest):
         blob_name = self.create_random_name('blob', 16)
         policy = self.create_random_name('policy', 16)
 
-        self.storage_cmd('storage container policy create -c {} -n {} --expiry {} --permissions acdlrw', account_info,
+        self.storage_cmd('storage container policy create -c {} -n {} --expiry {} --permissions rwdxlti', account_info,
                          container, policy, expiry)
         self.storage_cmd('storage container policy list -c {} ', account_info, container)\
             .assert_with_checks(JMESPathCheckExists('{}.expiry'.format(policy)),
-                                JMESPathCheck('{}.permission'.format(policy), 'racwdl'))
+                                JMESPathCheck('{}.permission'.format(policy), 'rwdxlti'))
         self.storage_cmd('storage container policy show -c {} -n {} ', account_info, container, policy, expiry)\
             .assert_with_checks(JMESPathCheckExists('expiry'),
-                                JMESPathCheck('permission', 'racwdl'))
+                                JMESPathCheck('permission', 'rwdxlti'))
 
         sas = self.storage_cmd('storage blob generate-sas -n {} -c {} --policy-name {} -otsv ', account_info, blob_name,
                                container, policy).output.strip()
@@ -108,11 +108,11 @@ class StorageSASScenario(StorageScenarioMixin, LiveScenarioTest):
         self.storage_cmd('storage blob upload -n {} -c {} -f "{}" --sas-token "{}" ', account_info, blob_name, container,
                          local_file, sas)
 
-        self.storage_cmd('storage container policy update -c {} -n {} --permissions acdlr', account_info, container,
+        self.storage_cmd('storage container policy update -c {} -n {} --permissions rwdxl', account_info, container,
                          policy)
         self.storage_cmd('storage container policy show -c {} -n {} ', account_info, container, policy)\
             .assert_with_checks(JMESPathCheckExists('expiry'),
-                                JMESPathCheck('permission', 'racdl'))
+                                JMESPathCheck('permission', 'rwdxl'))
         self.storage_cmd('storage container policy delete -c {} -n {} ', account_info, container, policy)
         self.storage_cmd('storage container policy list -c {} ', account_info, container) \
             .assert_with_checks(NoneCheck())

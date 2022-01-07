@@ -96,7 +96,7 @@ def cf_blob_lease_client(cli_ctx, kwargs):
 
 
 def cf_container_client(cli_ctx, kwargs):
-    return cf_blob_service(cli_ctx, kwargs).get_container_client(container=kwargs.pop('container_name', None))
+    return cf_blob_service(cli_ctx, kwargs).get_container_client(container=kwargs.get('container_name', None))
 
 
 def cf_blob_sas(cli_ctx, kwargs):

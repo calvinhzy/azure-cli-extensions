@@ -286,3 +286,23 @@ def transform_immutability_policy(result):
     if result.immutability_period_since_creation_in_days:
         return result
     return None
+
+
+def transform_track2_acl_edit(result):
+    if "last_modified" in result.keys():
+        last_modified = result["last_modified"]
+        del result["last_modified"]
+        result["lastModified"] = last_modified
+    return result
+
+
+def transform_track2_acl_show(result):
+    return result.access_policy
+
+
+def transform_track2_acl_list(result):
+    policies = {}
+    if "signed_identifiers" in result.keys():
+        for identifier in result["signed_identifiers"]:
+            policies[identifier.id] = identifier.access_policy
+    return policies

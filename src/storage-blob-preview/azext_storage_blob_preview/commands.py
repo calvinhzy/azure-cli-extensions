@@ -141,3 +141,17 @@ def load_command_table(self, _):  # pylint: disable=too-many-locals, too-many-st
                                        table_transformer=transform_container_list)
         g.storage_command_oauth('restore', 'undelete_container', command_type=blob_service_sdk,
                                 min_api='2020-02-10', is_preview=True)
+
+    container_service_custom_sdk = get_custom_sdk('blob', client_factory=cf_container_client,
+                                             resource_type=CUSTOM_DATA_STORAGE_BLOB)
+
+    with self.command_group('storage container', custom_command_type=container_service_custom_sdk) as g:
+        from ._transformers import transform_acl_list_output, transform_track2_acl_edit, \
+            transform_track2_acl_show, transform_track2_acl_list
+        g.storage_custom_command_oauth('policy create', 'create_acl_policy', transform=transform_track2_acl_edit)
+        g.storage_custom_command_oauth('policy delete', 'delete_acl_policy', transform=transform_track2_acl_edit)
+        g.storage_custom_command_oauth('policy update', 'set_acl_policy', transform=transform_track2_acl_edit)
+        g.storage_custom_command_oauth('policy show', 'get_acl_policy', exception_handler=show_exception_handler,
+                                       transform=transform_track2_acl_show)
+        g.storage_custom_command_oauth('policy list', 'list_acl_policies', transform=transform_track2_acl_list,
+                                       table_transformer=transform_acl_list_output)

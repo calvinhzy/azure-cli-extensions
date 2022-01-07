@@ -609,6 +609,8 @@ def get_permission_allowed_values(permission_class):
         for i, item in enumerate(allowed_values):
             if item == 'delete_previous_version':
                 allowed_values[i] = 'x' + item
+            elif item == 'set_immutability_policy':
+                allowed_values[i] = 'i' + item
         return allowed_values
     return None
 
