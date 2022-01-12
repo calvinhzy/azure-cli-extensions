@@ -116,6 +116,13 @@ def cf_blob_sas(cli_ctx, kwargs):
                       account_key=kwargs.pop('account_key', None))
 
 
+def cf_shared_sas(cli_ctx, kwargs):
+    t_shared_sas = get_sdk(cli_ctx, CUSTOM_DATA_STORAGE_BLOB, '_shared.shared_access_signature#SharedAccessSignature')
+
+    return t_shared_sas(account_name=kwargs.pop('account_name', None),
+                      account_key=kwargs.pop('account_key', None))
+
+
 def cf_adls_service(cli_ctx, kwargs):
     t_adls_service = get_sdk(cli_ctx, ResourceType.DATA_STORAGE_FILEDATALAKE,
                              '_data_lake_service_client#DataLakeServiceClient')

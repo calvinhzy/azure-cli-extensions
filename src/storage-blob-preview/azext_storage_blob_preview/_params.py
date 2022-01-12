@@ -14,11 +14,14 @@ from ._validators import (validate_metadata, get_permission_validator, get_permi
 
 from .profiles import CUSTOM_DATA_STORAGE_BLOB
 
+from azure.cli.core.local_context import LocalContextAttribute, LocalContextAction
+
 
 def load_arguments(self, _):  # pylint: disable=too-many-locals, too-many-statements, too-many-lines
     from argcomplete.completers import FilesCompleter
 
     from knack.arguments import ignore_type, CLIArgumentType
+    from azure.cli.core.commands.parameters import get_resource_name_completion_list
 
     from .sdkutil import get_table_data_type
     from .completers import get_storage_name_completion_list
@@ -30,7 +33,11 @@ def load_arguments(self, _):  # pylint: disable=too-many-locals, too-many-statem
                                resource_type=CUSTOM_DATA_STORAGE_BLOB)
     t_rehydrate_priority = self.get_sdk('_generated.models._azure_blob_storage_enums#RehydratePriority',
                                         resource_type=CUSTOM_DATA_STORAGE_BLOB)
-
+    acct_name_type = CLIArgumentType(options_list=['--account-name', '-n'], help='The storage account name.',
+                                     id_part='name',
+                                     completer=get_resource_name_completion_list('Microsoft.Storage/storageAccounts'),
+                                     local_context_attribute=LocalContextAttribute(
+                                         name='storage_account_name', actions=[LocalContextAction.GET]))
     blob_name_type = CLIArgumentType(options_list=['--blob-name', '-b'], help='The blob name.',
                                      completer=get_storage_name_completion_list(t_base_blob_service, 'list_blobs',
                                                                                 parent='container_name'))
@@ -619,3 +626,41 @@ def load_arguments(self, _):  # pylint: disable=too-many-locals, too-many-statem
         c.argument('start', type=get_datetime_type(True),
                    help='start UTC datetime (Y-m-d\'T\'H:M:S\'Z\'). Defaults to time of request.')
         c.argument('expiry', type=get_datetime_type(True), help='expiration UTC datetime in (Y-m-d\'T\'H:M:S\'Z\')')
+
+    def resource_type_type(loader):
+        """ Returns a function which validates that resource types string contains only a combination of service,
+        container, and object. Their shorthand representations are s, c, and o. """
+
+        def impl(string):
+            t_resources = loader.get_models('_shared.models#ResourceTypes')
+            if set(string) - set("sco"):
+                raise ValueError
+            return t_resources.from_string(''.join(set(string)))
+
+        return impl
+
+    def services_type(loader):
+        """ Returns a function which validates that services string contains only a combination of blob, queue, table,
+        and file. Their shorthand representations are b, q, t, and f. """
+
+        def impl(string):
+            t_services = loader.get_models('_shared.models#Services')
+            if set(string) - set("bqtf"):
+                raise ValueError
+            return t_services.from_string(''.join(set(string)))
+
+        return impl
+
+    with self.argument_context('storage account generate-sas') as c:
+        t_account_permissions = self.get_sdk('#AccountSasPermissions')
+        c.register_sas_arguments()
+        c.argument('services', type=services_type(self))
+        c.argument('resource_types', type=resource_type_type(self))
+        c.argument('expiry', type=get_datetime_type(True))
+        c.argument('start', type=get_datetime_type(True))
+        c.argument('account_name', acct_name_type, options_list=['--account-name'])
+        c.argument('permission', options_list=('--permissions',),
+                   help='The permissions the SAS grants. Allowed values: {}. Can be combined.'.format(
+                       get_permission_help_string(t_account_permissions)),
+                   validator=get_permission_validator(t_account_permissions))
+        c.ignore('sas_token')

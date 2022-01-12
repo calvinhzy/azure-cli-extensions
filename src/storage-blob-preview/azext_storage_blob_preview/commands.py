@@ -7,7 +7,7 @@ from azure.cli.core.commands import CliCommandType
 from azure.cli.core.commands.arm import show_exception_handler
 from azure.cli.core.profiles import ResourceType
 
-from ._client_factory import cf_blob_client, cf_container_client, cf_blob_service, cf_blob_lease_client
+from ._client_factory import cf_blob_client, cf_container_client, cf_blob_service, cf_blob_lease_client, cf_blob_sas, cf_shared_sas
 from .profiles import CUSTOM_DATA_STORAGE_BLOB
 
 
@@ -143,7 +143,7 @@ def load_command_table(self, _):  # pylint: disable=too-many-locals, too-many-st
                                 min_api='2020-02-10', is_preview=True)
 
     container_service_custom_sdk = get_custom_sdk('blob', client_factory=cf_container_client,
-                                             resource_type=CUSTOM_DATA_STORAGE_BLOB)
+                                                  resource_type=CUSTOM_DATA_STORAGE_BLOB)
 
     with self.command_group('storage container', custom_command_type=container_service_custom_sdk) as g:
         from ._transformers import transform_acl_list_output, transform_track2_acl_edit, \
@@ -155,3 +155,7 @@ def load_command_table(self, _):  # pylint: disable=too-many-locals, too-many-st
                                        transform=transform_track2_acl_show)
         g.storage_custom_command_oauth('policy list', 'list_acl_policies', transform=transform_track2_acl_list,
                                        table_transformer=transform_acl_list_output)
+
+    sas_sdk = get_custom_sdk('blob', client_factory=cf_shared_sas, resource_type=CUSTOM_DATA_STORAGE_BLOB)
+    with self.command_group('storage account', custom_command_type=sas_sdk) as g:
+        g.storage_custom_command_oauth('generate-sas', 'generate_sas')
