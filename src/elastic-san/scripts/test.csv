@@ -1,0 +1,4 @@
+ResourceGroupName,ElasticSanName,VolumeGroupName,Name,SizeGiB
+testrgelasticsan,elasticsan1,volumegroup1,volume1,5
+testrgelasticsan,elasticsan1,volumegroup1,volume2,5
+testrgelasticsan,elasticsan1,volumegroup1,volume3,5
