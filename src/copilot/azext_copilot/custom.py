@@ -31,7 +31,8 @@ def handle_copilot(cmd):
 
     cmd = [
         'wt', '--window', '0', 'split-pane', '--tabColor', '#345beb', '--size', '0.4',
-        '--title', 'Copilot for Azure CLI', 'pwsh', '-NoExit', '-Command',
+        '--title', 'Copilot for Azure CLI', '-NoExit', '-Command',
+        # '--title', 'Copilot for Azure CLI', 'pwsh', '-NoExit', '-Command',
         'aish', '--shell-wrapper', f'{config_file_path}'
     ]
 
@@ -84,7 +85,7 @@ def _get_default_profile():
 
 
 def _get_aish_json():
-    tenant_id, subscription_id = _get_sub_info()
+    # tenant_id, subscription_id = _get_sub_info()
 
     # Load existing configuration if it exists
     json_file_path = os.path.join(GLOBAL_CONFIG_DIR, 'aish.config')
@@ -93,14 +94,14 @@ def _get_aish_json():
         with open(json_file_path, 'r') as json_file:
             existing_config = json.load(json_file)
 
-    # Update only if tenant or subscription changes
-    if existing_config.get('context', {}).get('tenant') != tenant_id:
-        existing_config['context'] = existing_config.get('context', {})
-        existing_config['context']['tenant'] = tenant_id
-
-    if existing_config.get('context', {}).get('subscription') != subscription_id:
-        existing_config['context'] = existing_config.get('context', {})
-        existing_config['context']['subscription'] = subscription_id
+    # # Update only if tenant or subscription changes
+    # if existing_config.get('context', {}).get('tenant') != tenant_id:
+    #     existing_config['context'] = existing_config.get('context', {})
+    #     existing_config['context']['tenant'] = tenant_id
+    #
+    # if existing_config.get('context', {}).get('subscription') != subscription_id:
+    #     existing_config['context'] = existing_config.get('context', {})
+    #     existing_config['context']['subscription'] = subscription_id
 
     # Update other fields only if they don't exist
     config = {
@@ -109,7 +110,7 @@ def _get_aish_json():
         "version": existing_config.get("version", "v0.1"),
         "prompt": existing_config.get("prompt", "Copilot for Azure CLI"),
         "agent": existing_config.get("agent", "az-cli"),
-        "context": existing_config.get("context", {}),
+        # "context": existing_config.get("context", {}),
         "title": existing_config.get("title", "Copilot for Azure CLI")
     }
 
