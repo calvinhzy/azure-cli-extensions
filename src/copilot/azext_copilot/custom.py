@@ -29,11 +29,13 @@ def handle_copilot(cmd):
 
     config_file_path, config = _get_aish_json()
 
+    aish_path = _get_aish_path()
+
     cmd = [
         'wt', '--window', '0', 'split-pane', '--tabColor', '#345beb', '--size', '0.4',
         '--title', 'Copilot for Azure CLI', '-NoExit', '-Command',
         # '--title', 'Copilot for Azure CLI', 'pwsh', '-NoExit', '-Command',
-        'aish', '--shell-wrapper', f'{config_file_path}'
+        aish_path, '--shell-wrapper', f'{config_file_path}'
     ]
 
     default_profile_guid = _get_default_profile()
@@ -49,7 +51,7 @@ def handle_copilot(cmd):
     try:
         subprocess.check_output(cmd)
     except subprocess.CalledProcessError as err:
-        raise aishServiceError('Could not strat az copilot sidebar: {} Command output: {}, '
+        raise aishServiceError('Could not start az copilot sidebar: {} Command output: {}, '
                                'please go to https://github.com/PowerShell/ShellCopilot install shell copilot first.'
                                .format(err, err.output))
 
@@ -65,6 +67,16 @@ def _is_aish_in_path():
 
     return False
 
+
+def _get_aish_path():
+    path_env = os.environ.get("PATH", "")
+    path_dirs = path_env.split(os.pathsep)
+
+    for path_dir in path_dirs:
+        exe_path = os.path.join(path_dir, 'aish.exe')
+        if os.path.isfile(exe_path) and os.access(exe_path, os.X_OK):
+            return exe_path
+    return "aish"
 
 def _get_default_profile():
     pattern = os.path.join(os.getenv("LOCALAPPDATA"),
@@ -111,7 +123,7 @@ def _get_aish_json():
         "prompt": existing_config.get("prompt", "Copilot for Azure CLI"),
         "agent": existing_config.get("agent", "az-cli"),
         # "context": existing_config.get("context", {}),
-        "title": existing_config.get("title", "Copilot for Azure CLI")
+        # "title": existing_config.get("title", "Copilot for Azure CLI")
     }
 
     with open(json_file_path, 'w') as json_file:
