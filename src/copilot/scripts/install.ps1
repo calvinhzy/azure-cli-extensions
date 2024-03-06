@@ -1,12 +1,21 @@
 ## Copyright (c) Microsoft Corporation.
 ## Licensed under the MIT License.
 
+#Requires -Version 7.2
+#Requires -PSEdition Core
+
 $aishPath = Join-Path $PWD "aish" "debug"
 $userPath = [Environment]::GetEnvironmentVariable("PATH", "User")
 $processPath = [Environment]::GetEnvironmentVariable("PATH", "Process")
 if ($processPath -notlike "*$aishPath*")
 {
     Write-Host "[Adding Shell Copilot to PATH]" -ForegroundColor Green
+    if ($userPath -notmatch ";$"){
+        $userPath += ";"
+    }
+    if ($processPath -notmatch ";$"){
+        $processPath += ";"
+    }
     [Environment]::SetEnvironmentVariable("PATH", $userPath + $aishPath, "User")
     [Environment]::SetEnvironmentVariable("PATH", $processPath + $aishPath, "Process")
 }
