@@ -2,6 +2,10 @@
 
 Release History
 ===============
+1.0.0b6
+++++++
+* Update shell-wrapper config content.
+
 1.0.0b4
 ++++++
 * Add install script.

@@ -27,7 +27,7 @@ def handle_copilot(cmd):
         raise aishServiceError('Could not find aish in $env:PATH, '
                                'please go to https://github.com/PowerShell/ShellCopilot install shell copilot first.')
 
-    config_file_path, config = _get_aish_json()
+    config_file_path, title = _get_aish_json()
 
     aish_path = _get_aish_path()
 
@@ -44,9 +44,9 @@ def handle_copilot(cmd):
         cmd.insert(index + 2, '--profile')
         cmd.insert(index + 3, f'{default_profile_guid}')
 
-    if config.get('title'):
+    if title:
         index = cmd.index('--title')
-        cmd[index + 1] = config.get('title')
+        cmd[index + 1] = title
 
     try:
         subprocess.check_output(cmd)
@@ -100,11 +100,11 @@ def _get_aish_json():
     # tenant_id, subscription_id = _get_sub_info()
 
     # Load existing configuration if it exists
-    json_file_path = os.path.join(GLOBAL_CONFIG_DIR, 'aish.config')
-    existing_config = {}
-    if os.path.exists(json_file_path):
-        with open(json_file_path, 'r') as json_file:
-            existing_config = json.load(json_file)
+    json_file_path = os.path.join(GLOBAL_CONFIG_DIR, 'aish.config.cli.json')
+    # existing_config = {}
+    # if os.path.exists(json_file_path):
+    #     with open(json_file_path, 'r') as json_file:
+    #         existing_config = json.load(json_file)
 
     # # Update only if tenant or subscription changes
     # if existing_config.get('context', {}).get('tenant') != tenant_id:
@@ -117,19 +117,18 @@ def _get_aish_json():
 
     # Update other fields only if they don't exist
     config = {
-        "name": existing_config.get("name", "Copilot for Azure CLI"),
-        "banner": existing_config.get("banner", "Copilot for Azure CLI"),
-        "version": existing_config.get("version", "v0.1"),
-        "prompt": existing_config.get("prompt", "Copilot for Azure CLI"),
-        "agent": existing_config.get("agent", "az-cli"),
-        # "context": existing_config.get("context", {}),
-        # "title": existing_config.get("title", "Copilot for Azure CLI")
+        "name": "az.copilot",
+        "banner": "Copilot",
+        "description": "Copilot can generate Azure CLI scripts, help you find commands and command sequences, "
+                       "troubleshoot errors, and more for managing Azure resource.",
+        "prompt": "Copilot",
+        "agent": "az-cli",
     }
 
     with open(json_file_path, 'w') as json_file:
         json.dump(config, json_file, indent=2)
 
-    return json_file_path, config
+    return json_file_path, "Copilot (Preview)"
 
 
 def _get_sub_info():
