@@ -120,7 +120,8 @@ def _get_aish_json():
         "name": "az.copilot",
         "banner": "Copilot",
         "description": "Copilot can generate Azure CLI scripts, help you find commands and command sequences, "
-                       "troubleshoot errors, and more for managing Azure resource.",
+                       "troubleshoot errors, and more for managing Azure resource. "
+                       "AI-Generated content may be incorrect.",
         "prompt": "Copilot",
         "agent": "az-cli",
     }
