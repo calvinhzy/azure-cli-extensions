@@ -118,11 +118,11 @@ def _get_aish_json():
     # Update other fields only if they don't exist
     config = {
         "name": "az.copilot",
-        "banner": "Copilot",
-        "description": "Copilot can generate Azure CLI scripts, help you find commands and command sequences, "
-                       "troubleshoot errors, and more for managing Azure resource. "
+        "banner": "Copilot (Preview)",
+        "description": "Copilot (Preview) can generate Azure CLI scripts, help you find commands and command sequences,"
+                       " troubleshoot errors, and more for managing Azure resource. "
                        "AI-Generated content may be incorrect.",
-        "prompt": "Copilot",
+        "prompt": "Copilot (Preview)",
         "agent": "az-cli",
     }
 
