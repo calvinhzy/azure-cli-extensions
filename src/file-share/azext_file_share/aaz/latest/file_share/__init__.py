@@ -9,8 +9,12 @@
 # flake8: noqa
 
 from .__cmd_group import *
+from ._check_name_availability import *
 from ._create import *
 from ._delete import *
+from ._get_limit import *
+from ._get_provisioning_recommendation import *
+from ._get_usage_data import *
 from ._list import *
 from ._show import *
 from ._update import *
