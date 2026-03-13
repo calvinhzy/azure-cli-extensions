@@ -1201,6 +1201,12 @@ def load_arguments(self, _):
             help="Enable managed installation of Gateway API CRDs from the standard release channel."
         )
         c.argument("enable_hosted_system", action="store_true", is_preview=True)
+        c.argument(
+            "enable_continuous_control_plane_and_addon_monitor",
+            action="store_true",
+            is_preview=True,
+            help="Enable continuous control plane and addon monitor for the cluster.",
+        )
 
     with self.argument_context("aks update") as c:
         # managed cluster paramerters
@@ -1778,6 +1784,18 @@ def load_arguments(self, _):
             action="store_true",
             is_preview=True,
             help="Disable Application Load Balancer (Application Gateway for Containers)."
+        )
+        c.argument(
+            "enable_continuous_control_plane_and_addon_monitor",
+            action="store_true",
+            is_preview=True,
+            help="Enable continuous control plane and addon monitor for the cluster.",
+        )
+        c.argument(
+            "disable_continuous_control_plane_and_addon_monitor",
+            action="store_true",
+            is_preview=True,
+            help="Disable continuous control plane and addon monitor for the cluster.",
         )
 
     with self.argument_context("aks upgrade") as c:
