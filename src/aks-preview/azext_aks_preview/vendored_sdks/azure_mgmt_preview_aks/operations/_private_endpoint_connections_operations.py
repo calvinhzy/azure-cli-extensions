@@ -46,7 +46,7 @@ def build_list_request(
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
 
-    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2025-06-02-preview"))
+    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2026-01-02-preview"))
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
@@ -90,7 +90,7 @@ def build_get_request(
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
 
-    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2025-06-02-preview"))
+    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2026-01-02-preview"))
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
@@ -137,7 +137,7 @@ def build_update_request(
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
 
-    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2025-06-02-preview"))
+    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2026-01-02-preview"))
     content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
     accept = _headers.pop("Accept", "application/json")
 
@@ -187,7 +187,7 @@ def build_delete_request(
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
 
-    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2025-06-02-preview"))
+    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2026-01-02-preview"))
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
@@ -294,7 +294,8 @@ class PrivateEndpointConnectionsOperations:
 
         if response.status_code not in [200]:
             map_error(status_code=response.status_code, response=response, error_map=error_map)
-            raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+            error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+            raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
         deserialized = self._deserialize("PrivateEndpointConnectionListResult", pipeline_response.http_response)
 
@@ -357,7 +358,8 @@ class PrivateEndpointConnectionsOperations:
 
         if response.status_code not in [200]:
             map_error(status_code=response.status_code, response=response, error_map=error_map)
-            raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+            error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+            raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
         deserialized = self._deserialize("PrivateEndpointConnection", pipeline_response.http_response)
 
@@ -378,8 +380,6 @@ class PrivateEndpointConnectionsOperations:
         **kwargs: Any
     ) -> _models.PrivateEndpointConnection:
         """Updates a private endpoint connection.
-
-        Updates a private endpoint connection.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -411,8 +411,6 @@ class PrivateEndpointConnectionsOperations:
     ) -> _models.PrivateEndpointConnection:
         """Updates a private endpoint connection.
 
-        Updates a private endpoint connection.
-
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
         :type resource_group_name: str
@@ -440,8 +438,6 @@ class PrivateEndpointConnectionsOperations:
         **kwargs: Any
     ) -> _models.PrivateEndpointConnection:
         """Updates a private endpoint connection.
-
-        Updates a private endpoint connection.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -503,7 +499,8 @@ class PrivateEndpointConnectionsOperations:
 
         if response.status_code not in [200, 201]:
             map_error(status_code=response.status_code, response=response, error_map=error_map)
-            raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+            error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+            raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
         deserialized = self._deserialize("PrivateEndpointConnection", pipeline_response.http_response)
 
@@ -554,12 +551,20 @@ class PrivateEndpointConnectionsOperations:
             except (StreamConsumedError, StreamClosedError):
                 pass
             map_error(status_code=response.status_code, response=response, error_map=error_map)
-            raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+            error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+            raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["Azure-AsyncOperation"] = self._deserialize(
+                "str", response.headers.get("Azure-AsyncOperation")
+            )
+            response_headers["Retry-After"] = self._deserialize("int", response.headers.get("Retry-After"))
 
         deserialized = response.stream_download(self._client._pipeline, decompress=_decompress)
 
         if cls:
-            return cls(pipeline_response, deserialized, {})  # type: ignore
+            return cls(pipeline_response, deserialized, response_headers)  # type: ignore
 
         return deserialized  # type: ignore
 
@@ -568,8 +573,6 @@ class PrivateEndpointConnectionsOperations:
         self, resource_group_name: str, resource_name: str, private_endpoint_connection_name: str, **kwargs: Any
     ) -> LROPoller[None]:
         """Deletes a private endpoint connection.
-
-        Deletes a private endpoint connection.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -609,7 +612,9 @@ class PrivateEndpointConnectionsOperations:
                 return cls(pipeline_response, None, {})  # type: ignore
 
         if polling is True:
-            polling_method: PollingMethod = cast(PollingMethod, ARMPolling(lro_delay, **kwargs))
+            polling_method: PollingMethod = cast(
+                PollingMethod, ARMPolling(lro_delay, lro_options={"final-state-via": "azure-async-operation"}, **kwargs)
+            )
         elif polling is False:
             polling_method = cast(PollingMethod, NoPolling())
         else:

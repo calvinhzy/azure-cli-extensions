@@ -42,7 +42,7 @@ def build_list_request(subscription_id: str, **kwargs: Any) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
 
-    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2025-06-02-preview"))
+    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2026-01-02-preview"))
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
@@ -66,7 +66,7 @@ def build_list_by_resource_group_request(resource_group_name: str, subscription_
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
 
-    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2025-06-02-preview"))
+    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2026-01-02-preview"))
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
@@ -96,7 +96,7 @@ def build_get_request(resource_group_name: str, resource_name: str, subscription
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
 
-    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2025-06-02-preview"))
+    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2026-01-02-preview"))
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
@@ -136,7 +136,7 @@ def build_create_or_update_request(
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
 
-    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2025-06-02-preview"))
+    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2026-01-02-preview"))
     content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
     accept = _headers.pop("Accept", "application/json")
 
@@ -179,7 +179,7 @@ def build_update_tags_request(
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
 
-    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2025-06-02-preview"))
+    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2026-01-02-preview"))
     content_type: Optional[str] = kwargs.pop("content_type", _headers.pop("Content-Type", None))
     accept = _headers.pop("Accept", "application/json")
 
@@ -222,7 +222,7 @@ def build_delete_request(
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
 
-    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2025-06-02-preview"))
+    api_version: str = kwargs.pop("api_version", _params.pop("api-version", "2026-01-02-preview"))
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
@@ -278,8 +278,6 @@ class SnapshotsOperations:
     @distributed_trace
     def list(self, **kwargs: Any) -> Iterable["_models.Snapshot"]:
         """Gets a list of snapshots in the specified subscription.
-
-        Gets a list of snapshots in the specified subscription.
 
         :return: An iterator like instance of either Snapshot or the result of cls(response)
         :rtype: ~azure.core.paging.ItemPaged[~azure.mgmt.containerservice.models.Snapshot]
@@ -345,7 +343,8 @@ class SnapshotsOperations:
 
             if response.status_code not in [200]:
                 map_error(status_code=response.status_code, response=response, error_map=error_map)
-                raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+                error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+                raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
             return pipeline_response
 
@@ -354,8 +353,6 @@ class SnapshotsOperations:
     @distributed_trace
     def list_by_resource_group(self, resource_group_name: str, **kwargs: Any) -> Iterable["_models.Snapshot"]:
         """Lists snapshots in the specified subscription and resource group.
-
-        Lists snapshots in the specified subscription and resource group.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -425,7 +422,8 @@ class SnapshotsOperations:
 
             if response.status_code not in [200]:
                 map_error(status_code=response.status_code, response=response, error_map=error_map)
-                raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+                error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+                raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
             return pipeline_response
 
@@ -434,8 +432,6 @@ class SnapshotsOperations:
     @distributed_trace
     def get(self, resource_group_name: str, resource_name: str, **kwargs: Any) -> _models.Snapshot:
         """Gets a snapshot.
-
-        Gets a snapshot.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -479,7 +475,8 @@ class SnapshotsOperations:
 
         if response.status_code not in [200]:
             map_error(status_code=response.status_code, response=response, error_map=error_map)
-            raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+            error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+            raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
         deserialized = self._deserialize("Snapshot", pipeline_response.http_response)
 
@@ -499,8 +496,6 @@ class SnapshotsOperations:
         **kwargs: Any
     ) -> _models.Snapshot:
         """Creates or updates a snapshot.
-
-        Creates or updates a snapshot.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -529,8 +524,6 @@ class SnapshotsOperations:
     ) -> _models.Snapshot:
         """Creates or updates a snapshot.
 
-        Creates or updates a snapshot.
-
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
         :type resource_group_name: str
@@ -555,8 +548,6 @@ class SnapshotsOperations:
         **kwargs: Any
     ) -> _models.Snapshot:
         """Creates or updates a snapshot.
-
-        Creates or updates a snapshot.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -615,7 +606,8 @@ class SnapshotsOperations:
 
         if response.status_code not in [200, 201]:
             map_error(status_code=response.status_code, response=response, error_map=error_map)
-            raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+            error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+            raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
         deserialized = self._deserialize("Snapshot", pipeline_response.http_response)
 
@@ -635,8 +627,6 @@ class SnapshotsOperations:
         **kwargs: Any
     ) -> _models.Snapshot:
         """Updates tags on a snapshot.
-
-        Updates tags on a snapshot.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -665,8 +655,6 @@ class SnapshotsOperations:
     ) -> _models.Snapshot:
         """Updates tags on a snapshot.
 
-        Updates tags on a snapshot.
-
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
         :type resource_group_name: str
@@ -691,8 +679,6 @@ class SnapshotsOperations:
         **kwargs: Any
     ) -> _models.Snapshot:
         """Updates tags on a snapshot.
-
-        Updates tags on a snapshot.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -751,7 +737,8 @@ class SnapshotsOperations:
 
         if response.status_code not in [200]:
             map_error(status_code=response.status_code, response=response, error_map=error_map)
-            raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+            error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+            raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
         deserialized = self._deserialize("Snapshot", pipeline_response.http_response)
 
@@ -765,8 +752,6 @@ class SnapshotsOperations:
         self, resource_group_name: str, resource_name: str, **kwargs: Any
     ) -> None:
         """Deletes a snapshot.
-
-        Deletes a snapshot.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -810,7 +795,8 @@ class SnapshotsOperations:
 
         if response.status_code not in [200, 204]:
             map_error(status_code=response.status_code, response=response, error_map=error_map)
-            raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+            error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+            raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
         if cls:
             return cls(pipeline_response, None, {})  # type: ignore

@@ -66,8 +66,6 @@ class SnapshotsOperations:
     def list(self, **kwargs: Any) -> AsyncIterable["_models.Snapshot"]:
         """Gets a list of snapshots in the specified subscription.
 
-        Gets a list of snapshots in the specified subscription.
-
         :return: An iterator like instance of either Snapshot or the result of cls(response)
         :rtype: ~azure.core.async_paging.AsyncItemPaged[~azure.mgmt.containerservice.models.Snapshot]
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -132,7 +130,8 @@ class SnapshotsOperations:
 
             if response.status_code not in [200]:
                 map_error(status_code=response.status_code, response=response, error_map=error_map)
-                raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+                error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+                raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
             return pipeline_response
 
@@ -141,8 +140,6 @@ class SnapshotsOperations:
     @distributed_trace
     def list_by_resource_group(self, resource_group_name: str, **kwargs: Any) -> AsyncIterable["_models.Snapshot"]:
         """Lists snapshots in the specified subscription and resource group.
-
-        Lists snapshots in the specified subscription and resource group.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -212,7 +209,8 @@ class SnapshotsOperations:
 
             if response.status_code not in [200]:
                 map_error(status_code=response.status_code, response=response, error_map=error_map)
-                raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+                error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+                raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
             return pipeline_response
 
@@ -221,8 +219,6 @@ class SnapshotsOperations:
     @distributed_trace_async
     async def get(self, resource_group_name: str, resource_name: str, **kwargs: Any) -> _models.Snapshot:
         """Gets a snapshot.
-
-        Gets a snapshot.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -266,7 +262,8 @@ class SnapshotsOperations:
 
         if response.status_code not in [200]:
             map_error(status_code=response.status_code, response=response, error_map=error_map)
-            raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+            error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+            raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
         deserialized = self._deserialize("Snapshot", pipeline_response.http_response)
 
@@ -286,8 +283,6 @@ class SnapshotsOperations:
         **kwargs: Any
     ) -> _models.Snapshot:
         """Creates or updates a snapshot.
-
-        Creates or updates a snapshot.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -316,8 +311,6 @@ class SnapshotsOperations:
     ) -> _models.Snapshot:
         """Creates or updates a snapshot.
 
-        Creates or updates a snapshot.
-
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
         :type resource_group_name: str
@@ -342,8 +335,6 @@ class SnapshotsOperations:
         **kwargs: Any
     ) -> _models.Snapshot:
         """Creates or updates a snapshot.
-
-        Creates or updates a snapshot.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -402,7 +393,8 @@ class SnapshotsOperations:
 
         if response.status_code not in [200, 201]:
             map_error(status_code=response.status_code, response=response, error_map=error_map)
-            raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+            error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+            raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
         deserialized = self._deserialize("Snapshot", pipeline_response.http_response)
 
@@ -422,8 +414,6 @@ class SnapshotsOperations:
         **kwargs: Any
     ) -> _models.Snapshot:
         """Updates tags on a snapshot.
-
-        Updates tags on a snapshot.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -452,8 +442,6 @@ class SnapshotsOperations:
     ) -> _models.Snapshot:
         """Updates tags on a snapshot.
 
-        Updates tags on a snapshot.
-
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
         :type resource_group_name: str
@@ -478,8 +466,6 @@ class SnapshotsOperations:
         **kwargs: Any
     ) -> _models.Snapshot:
         """Updates tags on a snapshot.
-
-        Updates tags on a snapshot.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -538,7 +524,8 @@ class SnapshotsOperations:
 
         if response.status_code not in [200]:
             map_error(status_code=response.status_code, response=response, error_map=error_map)
-            raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+            error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+            raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
         deserialized = self._deserialize("Snapshot", pipeline_response.http_response)
 
@@ -550,8 +537,6 @@ class SnapshotsOperations:
     @distributed_trace_async
     async def delete(self, resource_group_name: str, resource_name: str, **kwargs: Any) -> None:
         """Deletes a snapshot.
-
-        Deletes a snapshot.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -595,7 +580,8 @@ class SnapshotsOperations:
 
         if response.status_code not in [200, 204]:
             map_error(status_code=response.status_code, response=response, error_map=error_map)
-            raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+            error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+            raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
         if cls:
             return cls(pipeline_response, None, {})  # type: ignore

@@ -57,8 +57,6 @@ class TrustedAccessRolesOperations:
     def list(self, location: str, **kwargs: Any) -> AsyncIterable["_models.TrustedAccessRole"]:
         """List supported trusted access roles.
 
-        List supported trusted access roles.
-
         :param location: The name of the Azure region. Required.
         :type location: str
         :return: An iterator like instance of either TrustedAccessRole or the result of cls(response)
@@ -127,7 +125,8 @@ class TrustedAccessRolesOperations:
 
             if response.status_code not in [200]:
                 map_error(status_code=response.status_code, response=response, error_map=error_map)
-                raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+                error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+                raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
             return pipeline_response
 

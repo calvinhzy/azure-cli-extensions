@@ -65,8 +65,6 @@ class MachinesOperations:
     ) -> AsyncIterable["_models.Machine"]:
         """Gets a list of machines in the specified agent pool.
 
-        Gets a list of machines in the specified agent pool.
-
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
         :type resource_group_name: str
@@ -141,7 +139,8 @@ class MachinesOperations:
 
             if response.status_code not in [200]:
                 map_error(status_code=response.status_code, response=response, error_map=error_map)
-                raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+                error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+                raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
             return pipeline_response
 
@@ -152,8 +151,6 @@ class MachinesOperations:
         self, resource_group_name: str, resource_name: str, agent_pool_name: str, machine_name: str, **kwargs: Any
     ) -> _models.Machine:
         """Get a specific machine in the specified agent pool.
-
-        Get a specific machine in the specified agent pool.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -203,7 +200,8 @@ class MachinesOperations:
 
         if response.status_code not in [200]:
             map_error(status_code=response.status_code, response=response, error_map=error_map)
-            raise HttpResponseError(response=response, error_format=ARMErrorFormat)
+            error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
+            raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
         deserialized = self._deserialize("Machine", pipeline_response.http_response)
 
@@ -280,10 +278,17 @@ class MachinesOperations:
             error = self._deserialize.failsafe_deserialize(_models.ErrorResponse, pipeline_response)
             raise HttpResponseError(response=response, model=error, error_format=ARMErrorFormat)
 
+        response_headers = {}
+        if response.status_code == 201:
+            response_headers["Azure-AsyncOperation"] = self._deserialize(
+                "str", response.headers.get("Azure-AsyncOperation")
+            )
+            response_headers["Retry-After"] = self._deserialize("int", response.headers.get("Retry-After"))
+
         deserialized = response.stream_download(self._client._pipeline, decompress=_decompress)
 
         if cls:
-            return cls(pipeline_response, deserialized, {})  # type: ignore
+            return cls(pipeline_response, deserialized, response_headers)  # type: ignore
 
         return deserialized  # type: ignore
 
@@ -302,8 +307,6 @@ class MachinesOperations:
         **kwargs: Any
     ) -> AsyncLROPoller[_models.Machine]:
         """Creates or updates a machine in the specified agent pool.
-
-        Creates or updates a machine in the specified agent pool.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -347,8 +350,6 @@ class MachinesOperations:
     ) -> AsyncLROPoller[_models.Machine]:
         """Creates or updates a machine in the specified agent pool.
 
-        Creates or updates a machine in the specified agent pool.
-
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
         :type resource_group_name: str
@@ -388,8 +389,6 @@ class MachinesOperations:
         **kwargs: Any
     ) -> AsyncLROPoller[_models.Machine]:
         """Creates or updates a machine in the specified agent pool.
-
-        Creates or updates a machine in the specified agent pool.
 
         :param resource_group_name: The name of the resource group. The name is case insensitive.
          Required.
@@ -449,7 +448,10 @@ class MachinesOperations:
             return deserialized
 
         if polling is True:
-            polling_method: AsyncPollingMethod = cast(AsyncPollingMethod, AsyncARMPolling(lro_delay, **kwargs))
+            polling_method: AsyncPollingMethod = cast(
+                AsyncPollingMethod,
+                AsyncARMPolling(lro_delay, lro_options={"final-state-via": "azure-async-operation"}, **kwargs),
+            )
         elif polling is False:
             polling_method = cast(AsyncPollingMethod, AsyncNoPolling())
         else:
