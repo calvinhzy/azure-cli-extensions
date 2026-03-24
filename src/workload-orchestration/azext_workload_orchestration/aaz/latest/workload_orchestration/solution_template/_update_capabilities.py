@@ -9,22 +9,22 @@
 # flake8: noqa
 
 from azure.cli.core.aaz import *
-from azext_workload_orchestration.aaz.latest.workload_orchestration._resource_validator import ValidateResourceExists
 
 
 @register_command(
-    "workload-orchestration context site-reference create",
+    "workload-orchestration solution-template update-capabilities",
 )
-class Create(AAZCommand):
-    """Create Site Reference Resource
-    :example: Create a Site Reference
-        az workload-orchestration context site-reference create -g {rg} -n {site_reference_name} --context-name {context_name} --site-id {site_id}
+class UpdateCapabilities(AAZCommand):
+    """Update the capabilities of a Solution Template Resource
+
+    :example: Update Solution Template Capabilities
+        az workload-orchestration solution-template update-capabilities -n mySolutionTemplate --capabilities "capability1" "capability2" "capability3" --location eastus --resource-group myResourceGroup
     """
 
     _aaz_info = {
         "version": "2025-08-01",
         "resources": [
-            ["mgmt-plane", "/subscriptions/{}/resourcegroups/{}/providers/Microsoft.Edge/contexts/{}/sitereferences/{}", "2025-08-01"],
+            ["mgmt-plane", "/subscriptions/{}/resourcegroups/{}/providers/Microsoft.Edge/solutiontemplates/{}", "2025-08-01"],
         ]
     }
 
@@ -42,46 +42,49 @@ class Create(AAZCommand):
             return cls._args_schema
         cls._args_schema = super()._build_arguments_schema(*args, **kwargs)
 
-        # define Arg Group ""
-
         _args_schema = cls._args_schema
-        _args_schema.context_name = AAZStrArg(
-            options=["--context-name"],
-            help="The name of the Context.",
-            required=True,
-            fmt=AAZStrArgFormat(
-                pattern="^[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?)*$",
-                max_length=61,
-                min_length=3,
-            ),
-        )
         _args_schema.resource_group = AAZResourceGroupNameArg(
             required=True,
         )
-        _args_schema.site_reference_name = AAZStrArg(
-            options=["-n", "--name", "--site-reference-name"],
-            help="The name of the SiteReference",
+        _args_schema.solution_template_name = AAZStrArg(
+            options=["-n", "--name", "--solution-template-name"],
+            help="The name of the SolutionTemplate",
             required=True,
             fmt=AAZStrArgFormat(
                 pattern="^[a-zA-Z0-9-]{3,24}$",
             ),
         )
 
-        # define Arg Group "Properties"
-
-        _args_schema = cls._args_schema
-        _args_schema.site_id = AAZStrArg(
-            options=["--site-id"],
+        _args_schema.capabilities = AAZListArg(
+            options=["--capabilities"],
             arg_group="Properties",
-            help="Azure Resource ID for Site",
+            help="List of capabilities",
+            required=True,
         )
+        _args_schema.description = AAZStrArg(
+            options=["--description"],
+            arg_group="Properties",
+            help="Description of Solution template",
+            required=True,
+        )
+
+        capabilities = cls._args_schema.capabilities
+        capabilities.Element = AAZStrArg()
+
+        _args_schema.location = AAZResourceLocationArg(
+            arg_group="Resource",
+            help="The geo-location where the resource lives",
+            required=True,
+            fmt=AAZResourceLocationArgFormat(
+                resource_group_arg="resource_group",
+            ),
+        )
+
         return cls._args_schema
 
     def _execute_operations(self):
         self.pre_operations()
-        if has_value(self.ctx.args.site_id):
-            ValidateResourceExists(ctx=self.ctx, resource_id=self.ctx.args.site_id, resource_label="Site")()
-        yield self.SiteReferencesCreateOrUpdate(ctx=self.ctx)()
+        yield self.SolutionTemplatesUpdateCapabilities(ctx=self.ctx)()
         self.post_operations()
 
     @register_callback
@@ -96,7 +99,7 @@ class Create(AAZCommand):
         result = self.deserialize_output(self.ctx.vars.instance, client_flatten=True)
         return result
 
-    class SiteReferencesCreateOrUpdate(AAZHttpOperation):
+    class SolutionTemplatesUpdateCapabilities(AAZHttpOperation):
         CLIENT_TYPE = "MgmtClient"
 
         def __call__(self, *args, **kwargs):
@@ -126,7 +129,7 @@ class Create(AAZCommand):
         @property
         def url(self):
             return self.client.format_url(
-                "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Edge/contexts/{contextName}/siteReferences/{siteReferenceName}",
+                "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Edge/solutionTemplates/{solutionTemplateName}",
                 **self.url_parameters
             )
 
@@ -142,15 +145,11 @@ class Create(AAZCommand):
         def url_parameters(self):
             parameters = {
                 **self.serialize_url_param(
-                    "contextName", self.ctx.args.context_name,
-                    required=True,
-                ),
-                **self.serialize_url_param(
                     "resourceGroupName", self.ctx.args.resource_group,
                     required=True,
                 ),
                 **self.serialize_url_param(
-                    "siteReferenceName", self.ctx.args.site_reference_name,
+                    "solutionTemplateName", self.ctx.args.solution_template_name,
                     required=True,
                 ),
                 **self.serialize_url_param(
@@ -189,11 +188,17 @@ class Create(AAZCommand):
                 typ=AAZObjectType,
                 typ_kwargs={"flags": {"required": True, "client_flatten": True}}
             )
+            _builder.set_prop("location", AAZStrType, ".location", typ_kwargs={"flags": {"required": True}})
             _builder.set_prop("properties", AAZObjectType)
 
             properties = _builder.get(".properties")
             if properties is not None:
-                properties.set_prop("siteId", AAZStrType, ".site_id", typ_kwargs={"flags": {"required": True}})
+                properties.set_prop("capabilities", AAZListType, ".capabilities", typ_kwargs={"flags": {"required": True}})
+                properties.set_prop("description", AAZStrType, ".description", typ_kwargs={"flags": {"required": True}})
+
+            capabilities = _builder.get(".properties.capabilities")
+            if capabilities is not None:
+                capabilities.set_elements(AAZStrType, ".")
 
             return self.serialize_content(_content_value)
 
@@ -215,8 +220,15 @@ class Create(AAZCommand):
             cls._schema_on_200_201 = AAZObjectType()
 
             _schema_on_200_201 = cls._schema_on_200_201
+            _schema_on_200_201.e_tag = AAZStrType(
+                serialized_name="eTag",
+                flags={"read_only": True},
+            )
             _schema_on_200_201.id = AAZStrType(
                 flags={"read_only": True},
+            )
+            _schema_on_200_201.location = AAZStrType(
+                flags={"required": True},
             )
             _schema_on_200_201.name = AAZStrType(
                 flags={"read_only": True},
@@ -226,19 +238,33 @@ class Create(AAZCommand):
                 serialized_name="systemData",
                 flags={"read_only": True},
             )
+            _schema_on_200_201.tags = AAZDictType()
             _schema_on_200_201.type = AAZStrType(
                 flags={"read_only": True},
             )
 
             properties = cls._schema_on_200_201.properties
+            properties.capabilities = AAZListType(
+                flags={"required": True},
+            )
+            properties.description = AAZStrType(
+                flags={"required": True},
+            )
+            properties.enable_external_validation = AAZBoolType(
+                serialized_name="enableExternalValidation",
+            )
+            properties.latest_version = AAZStrType(
+                serialized_name="latestVersion",
+                flags={"read_only": True},
+            )
             properties.provisioning_state = AAZStrType(
                 serialized_name="provisioningState",
                 flags={"read_only": True},
             )
-            properties.site_id = AAZStrType(
-                serialized_name="siteId",
-                flags={"required": True},
-            )
+            properties.state = AAZStrType()
+
+            capabilities = cls._schema_on_200_201.properties.capabilities
+            capabilities.Element = AAZStrType()
 
             system_data = cls._schema_on_200_201.system_data
             system_data.created_at = AAZStrType(
@@ -260,11 +286,14 @@ class Create(AAZCommand):
                 serialized_name="lastModifiedByType",
             )
 
+            tags = cls._schema_on_200_201.tags
+            tags.Element = AAZStrType()
+
             return cls._schema_on_200_201
 
 
-class _CreateHelper:
-    """Helper class for Create"""
+class _UpdateCapabilitiesHelper:
+    """Helper class for UpdateCapabilities"""
 
 
-__all__ = ["Create"]
+__all__ = ["UpdateCapabilities"]
