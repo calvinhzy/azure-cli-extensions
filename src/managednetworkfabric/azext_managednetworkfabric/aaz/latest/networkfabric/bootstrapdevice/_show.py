@@ -12,27 +12,26 @@ from azure.cli.core.aaz import *
 
 
 @register_command(
-    "networkfabric internetgatewayrule update",
+    "networkfabric bootstrapdevice show",
 )
-class Update(AAZCommand):
-    """Update the Internet Gateway Rule resource.
+class Show(AAZCommand):
+    """Get a Network Bootstrap Device resource details.
 
-    :example: Update the Internet Gateway Rule
-        az networkfabric internetgatewayrule update --resource-group "example-rg" --resource-name "example-internetgatewayrule" --tags "{key3311:1234}"
+    :example: Show the Bootstrap Device resource
+        az networkfabric bootstrapdevice show --resource-group example-rg --resource-name example-device
     """
 
     _aaz_info = {
         "version": "2025-07-15",
         "resources": [
-            ["mgmt-plane", "/subscriptions/{}/resourcegroups/{}/providers/microsoft.managednetworkfabric/internetgatewayrules/{}", "2025-07-15"],
+            ["mgmt-plane", "/subscriptions/{}/resourcegroups/{}/providers/microsoft.managednetworkfabric/networkbootstrapdevices/{}", "2025-07-15"],
         ]
     }
 
-    AZ_SUPPORT_NO_WAIT = True
-
     def _handler(self, command_args):
         super()._handler(command_args)
-        return self.build_lro_poller(self._execute_operations, self._output)
+        self._execute_operations()
+        return self._output()
 
     _args_schema = None
 
@@ -47,7 +46,7 @@ class Update(AAZCommand):
         _args_schema = cls._args_schema
         _args_schema.resource_name = AAZStrArg(
             options=["--resource-name"],
-            help="Name of the Internet Gateway rule.",
+            help="Name of the Network Bootstrap Device.",
             required=True,
             id_part="name",
             fmt=AAZStrArgFormat(
@@ -57,23 +56,11 @@ class Update(AAZCommand):
         _args_schema.resource_group = AAZResourceGroupNameArg(
             required=True,
         )
-
-        # define Arg Group "Body"
-
-        _args_schema = cls._args_schema
-        _args_schema.tags = AAZDictArg(
-            options=["--tags"],
-            arg_group="Body",
-            help="Resource tags.",
-        )
-
-        tags = cls._args_schema.tags
-        tags.Element = AAZStrArg()
         return cls._args_schema
 
     def _execute_operations(self):
         self.pre_operations()
-        yield self.InternetGatewayRulesUpdate(ctx=self.ctx)()
+        self.NetworkBootstrapDevicesGet(ctx=self.ctx)()
         self.post_operations()
 
     @register_callback
@@ -88,43 +75,27 @@ class Update(AAZCommand):
         result = self.deserialize_output(self.ctx.vars.instance, client_flatten=True)
         return result
 
-    class InternetGatewayRulesUpdate(AAZHttpOperation):
+    class NetworkBootstrapDevicesGet(AAZHttpOperation):
         CLIENT_TYPE = "MgmtClient"
 
         def __call__(self, *args, **kwargs):
             request = self.make_request()
             session = self.client.send_request(request=request, stream=False, **kwargs)
-            if session.http_response.status_code in [202]:
-                return self.client.build_lro_polling(
-                    self.ctx.args.no_wait,
-                    session,
-                    self.on_200,
-                    self.on_error,
-                    lro_options={"final-state-via": "location"},
-                    path_format_arguments=self.url_parameters,
-                )
             if session.http_response.status_code in [200]:
-                return self.client.build_lro_polling(
-                    self.ctx.args.no_wait,
-                    session,
-                    self.on_200,
-                    self.on_error,
-                    lro_options={"final-state-via": "location"},
-                    path_format_arguments=self.url_parameters,
-                )
+                return self.on_200(session)
 
             return self.on_error(session.http_response)
 
         @property
         def url(self):
             return self.client.format_url(
-                "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedNetworkFabric/internetGatewayRules/{internetGatewayRuleName}",
+                "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedNetworkFabric/networkBootstrapDevices/{networkBootstrapDeviceName}",
                 **self.url_parameters
             )
 
         @property
         def method(self):
-            return "PATCH"
+            return "GET"
 
         @property
         def error_format(self):
@@ -134,7 +105,7 @@ class Update(AAZCommand):
         def url_parameters(self):
             parameters = {
                 **self.serialize_url_param(
-                    "internetGatewayRuleName", self.ctx.args.resource_name,
+                    "networkBootstrapDeviceName", self.ctx.args.resource_name,
                     required=True,
                 ),
                 **self.serialize_url_param(
@@ -162,28 +133,10 @@ class Update(AAZCommand):
         def header_parameters(self):
             parameters = {
                 **self.serialize_header_param(
-                    "Content-Type", "application/json",
-                ),
-                **self.serialize_header_param(
                     "Accept", "application/json",
                 ),
             }
             return parameters
-
-        @property
-        def content(self):
-            _content_value, _builder = self.new_content_builder(
-                self.ctx.args,
-                typ=AAZObjectType,
-                typ_kwargs={"flags": {"required": True, "client_flatten": True}}
-            )
-            _builder.set_prop("tags", AAZDictType, ".tags")
-
-            tags = _builder.get(".tags")
-            if tags is not None:
-                tags.set_elements(AAZStrType, ".")
-
-            return self.serialize_content(_content_value)
 
         def on_200(self, session):
             data = self.deserialize_http_content(session)
@@ -206,6 +159,7 @@ class Update(AAZCommand):
             _schema_on_200.id = AAZStrType(
                 flags={"read_only": True},
             )
+            _schema_on_200.identity = AAZIdentityObjectType()
             _schema_on_200.location = AAZStrType(
                 flags={"required": True},
             )
@@ -224,73 +178,88 @@ class Update(AAZCommand):
                 flags={"read_only": True},
             )
 
-            properties = cls._schema_on_200.properties
-            properties.annotation = AAZStrType()
-            properties.internet_gateway_ids = AAZListType(
-                serialized_name="internetGatewayIds",
+            identity = cls._schema_on_200.identity
+            identity.principal_id = AAZStrType(
+                serialized_name="principalId",
                 flags={"read_only": True},
             )
-            properties.last_operation = AAZObjectType(
-                serialized_name="lastOperation",
+            identity.tenant_id = AAZStrType(
+                serialized_name="tenantId",
+                flags={"read_only": True},
+            )
+            identity.type = AAZStrType(
+                flags={"required": True},
+            )
+            identity.user_assigned_identities = AAZDictType(
+                serialized_name="userAssignedIdentities",
+            )
+
+            user_assigned_identities = cls._schema_on_200.identity.user_assigned_identities
+            user_assigned_identities.Element = AAZObjectType(
+                nullable=True,
+            )
+
+            _element = cls._schema_on_200.identity.user_assigned_identities.Element
+            _element.client_id = AAZStrType(
+                serialized_name="clientId",
+                flags={"read_only": True},
+            )
+            _element.principal_id = AAZStrType(
+                serialized_name="principalId",
+                flags={"read_only": True},
+            )
+
+            properties = cls._schema_on_200.properties
+            properties.administrative_state = AAZStrType(
+                serialized_name="administrativeState",
+                flags={"read_only": True},
+            )
+            properties.annotation = AAZStrType()
+            properties.configuration_state = AAZStrType(
+                serialized_name="configurationState",
+                flags={"read_only": True},
+            )
+            properties.dhcp_v4_server_ip_address = AAZStrType(
+                serialized_name="dhcpV4ServerIpAddress",
+                flags={"read_only": True},
+            )
+            properties.host_name = AAZStrType(
+                serialized_name="hostName",
+            )
+            properties.network_device_sku = AAZStrType(
+                serialized_name="networkDeviceSku",
+            )
+            properties.network_fabric_id = AAZStrType(
+                serialized_name="networkFabricId",
+                nullable=True,
+                flags={"read_only": True},
+            )
+            properties.primary_management_ipv4_address = AAZStrType(
+                serialized_name="primaryManagementIpv4Address",
+                flags={"read_only": True},
+            )
+            properties.primary_management_ipv6_address = AAZStrType(
+                serialized_name="primaryManagementIpv6Address",
                 flags={"read_only": True},
             )
             properties.provisioning_state = AAZStrType(
                 serialized_name="provisioningState",
                 flags={"read_only": True},
             )
-            properties.rule_properties = AAZObjectType(
-                serialized_name="ruleProperties",
-                flags={"required": True},
-            )
-
-            internet_gateway_ids = cls._schema_on_200.properties.internet_gateway_ids
-            internet_gateway_ids.Element = AAZStrType()
-
-            last_operation = cls._schema_on_200.properties.last_operation
-            last_operation.details = AAZStrType(
+            properties.secondary_management_ipv4_address = AAZStrType(
+                serialized_name="secondaryManagementIpv4Address",
                 flags={"read_only": True},
             )
-
-            rule_properties = cls._schema_on_200.properties.rule_properties
-            rule_properties.action = AAZStrType(
-                flags={"required": True},
+            properties.secondary_management_ipv6_address = AAZStrType(
+                serialized_name="secondaryManagementIpv6Address",
+                flags={"read_only": True},
             )
-            rule_properties.address_list = AAZListType(
-                serialized_name="addressList",
+            properties.serial_number = AAZStrType(
+                serialized_name="serialNumber",
             )
-            rule_properties.condition = AAZStrType()
-            rule_properties.destination_address_list = AAZListType(
-                serialized_name="destinationAddressList",
+            properties.version = AAZStrType(
+                flags={"read_only": True},
             )
-            rule_properties.header_address_list = AAZListType(
-                serialized_name="headerAddressList",
-            )
-            rule_properties.source_address_list = AAZListType(
-                serialized_name="sourceAddressList",
-            )
-
-            address_list = cls._schema_on_200.properties.rule_properties.address_list
-            address_list.Element = AAZStrType()
-
-            destination_address_list = cls._schema_on_200.properties.rule_properties.destination_address_list
-            destination_address_list.Element = AAZStrType()
-
-            header_address_list = cls._schema_on_200.properties.rule_properties.header_address_list
-            header_address_list.Element = AAZObjectType()
-
-            _element = cls._schema_on_200.properties.rule_properties.header_address_list.Element
-            _element.address_list = AAZListType(
-                serialized_name="addressList",
-            )
-            _element.header_name = AAZStrType(
-                serialized_name="headerName",
-            )
-
-            address_list = cls._schema_on_200.properties.rule_properties.header_address_list.Element.address_list
-            address_list.Element = AAZStrType()
-
-            source_address_list = cls._schema_on_200.properties.rule_properties.source_address_list
-            source_address_list.Element = AAZStrType()
 
             system_data = cls._schema_on_200.system_data
             system_data.created_at = AAZStrType(
@@ -318,8 +287,8 @@ class Update(AAZCommand):
             return cls._schema_on_200
 
 
-class _UpdateHelper:
-    """Helper class for Update"""
+class _ShowHelper:
+    """Helper class for Show"""
 
 
-__all__ = ["Update"]
+__all__ = ["Show"]
