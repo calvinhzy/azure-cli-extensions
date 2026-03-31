@@ -1934,6 +1934,7 @@ def aks_agentpool_add(
     skip_gpu_driver_install=False,
     gpu_driver=None,
     driver_type=None,
+    gpu_mig_strategy=None,
     ssh_access=CONST_SSH_ACCESS_LOCALUSER,
     # trusted launch
     enable_secure_boot=False,
@@ -2023,6 +2024,7 @@ def aks_agentpool_update(
     localdns_config=None,
     node_vm_size=None,
     gpu_driver=None,
+    gpu_mig_strategy=None,
 ):
     # DO NOT MOVE: get all the original parameters and save them as a dictionary
     raw_parameters = locals()
