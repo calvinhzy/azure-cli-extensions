@@ -694,8 +694,7 @@ def load_arguments(self, _):
                 "--nat-gateway-outbound-ips",
                 "--nat-gw-ips",
             ],
-            nargs="+",
-            help="Space-separated public IP resource IDs for the "
+            help="Comma-separated public IP resource IDs for the "
                  "cluster NAT gateway. V2 only.",
         )
         c.argument(
@@ -704,8 +703,7 @@ def load_arguments(self, _):
                 "--nat-gateway-outbound-ip-prefixes",
                 "--nat-gw-prefixes",
             ],
-            nargs="+",
-            help="Space-separated public IP prefix resource IDs "
+            help="Comma-separated public IP prefix resource IDs "
                  "for the cluster NAT gateway. V2 only.",
         )
         c.argument(
@@ -1332,8 +1330,7 @@ def load_arguments(self, _):
                 "--nat-gateway-outbound-ips",
                 "--nat-gw-ips",
             ],
-            nargs="+",
-            help="Space-separated public IP resource IDs for the "
+            help="Comma-separated public IP resource IDs for the "
                  "cluster NAT gateway. V2 only.",
         )
         c.argument(
@@ -1342,8 +1339,7 @@ def load_arguments(self, _):
                 "--nat-gateway-outbound-ip-prefixes",
                 "--nat-gw-prefixes",
             ],
-            nargs="+",
-            help="Space-separated public IP prefix resource IDs "
+            help="Comma-separated public IP prefix resource IDs "
                  "for the cluster NAT gateway. V2 only.",
         )
         c.argument("network_dataplane", arg_type=get_enum_type(network_dataplanes))

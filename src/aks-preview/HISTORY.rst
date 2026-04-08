@@ -12,6 +12,10 @@ To release a new version, please select a new version number (usually plus 1 to 
 Pending
 +++++++
 
+20.0.0b1
++++++++
+* [Breaking Change] `az aks create/update`: Change `--nat-gateway-outbound-ips` and `--nat-gateway-outbound-ip-prefixes` to use comma-separated values, consistent with load balancer outbound IP parameters.
+
 19.0.0b30
 +++++++
 * Add option `AzureContainerLinux` to `--os-sku` for `az aks create`, `az aks nodepool add`, and `az aks nodepool update`.
