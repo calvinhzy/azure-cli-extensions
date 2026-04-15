@@ -1685,32 +1685,37 @@ class ExportPipelineTargetProperties(msrest.serialization.Model):
      When 'AzureStorageBlob': "https://accountName.blob.core.windows.net/containerName/blobName"
      When 'AzureStorageBlobContainer':  "https://accountName.blob.core.windows.net/containerName".
     :type uri: str
-    :param key_vault_uri: Required. They key vault secret uri to obtain the target storage SAS
+    :param storage_access_mode: Required. The authentication mode to be used to access the target storage (Entra MI or SAS).
+    :type storage_access_mode: str
+    :param key_vault_uri: The key vault secret uri to obtain the target storage SAS
      token.
     :type key_vault_uri: str
     """
 
     _validation = {
-        'key_vault_uri': {'required': True},
+        'storage_access_mode': {'required': True},
     }
 
     _attribute_map = {
         'type': {'key': 'type', 'type': 'str'},
         'uri': {'key': 'uri', 'type': 'str'},
+        'storage_access_mode': {'key': 'storageAccessMode', 'type': 'str'},
         'key_vault_uri': {'key': 'keyVaultUri', 'type': 'str'},
     }
 
     def __init__(
         self,
         *,
-        key_vault_uri: str,
+        storage_access_mode: str,
         type: Optional[str] = None,
         uri: Optional[str] = None,
+        key_vault_uri: Optional[str] = None,
         **kwargs
     ):
         super(ExportPipelineTargetProperties, self).__init__(**kwargs)
         self.type = type
         self.uri = uri
+        self.storage_access_mode = storage_access_mode
         self.key_vault_uri = key_vault_uri
 
 
@@ -2231,32 +2236,38 @@ class ImportPipelineSourceProperties(msrest.serialization.Model):
      When 'AzureStorageBlob': "https://accountName.blob.core.windows.net/containerName/blobName"
      When 'AzureStorageBlobContainer': "https://accountName.blob.core.windows.net/containerName".
     :type uri: str
-    :param key_vault_uri: Required. They key vault secret uri to obtain the source storage SAS
+    :param storage_access_mode: Required. The authentication mode for accessing the storage account. Possible
+     values include: "ManagedIdentity", "SasToken".
+    :type storage_access_mode: str
+    :param key_vault_uri: They key vault secret uri to obtain the source storage SAS
      token.
     :type key_vault_uri: str
     """
 
     _validation = {
-        'key_vault_uri': {'required': True},
+        'storage_access_mode': {'required': True},
     }
 
     _attribute_map = {
         'type': {'key': 'type', 'type': 'str'},
         'uri': {'key': 'uri', 'type': 'str'},
+        'storage_access_mode': {'key': 'storageAccessMode', 'type': 'str'},
         'key_vault_uri': {'key': 'keyVaultUri', 'type': 'str'},
     }
 
     def __init__(
         self,
         *,
-        key_vault_uri: str,
+        storage_access_mode: str,
         type: Optional[Union[str, "PipelineSourceType"]] = "AzureStorageBlobContainer",
         uri: Optional[str] = None,
+        key_vault_uri: Optional[str] = None,
         **kwargs
     ):
         super(ImportPipelineSourceProperties, self).__init__(**kwargs)
         self.type = type
         self.uri = uri
+        self.storage_access_mode = storage_access_mode
         self.key_vault_uri = key_vault_uri
 
 

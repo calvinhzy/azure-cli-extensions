@@ -1,6 +1,6 @@
 {
-    "chosen_version": "2019-12-01-preview",
-    "total_api_version_list": ["2019-05-01-preview", "2019-06-01-preview", "2019-12-01-preview"],
+    "chosen_version": "2025-06-01-preview",
+    "total_api_version_list": ["2019-05-01-preview", "2019-06-01-preview", "2025-06-01-preview"],
     "client": {
         "name": "ContainerRegistryManagementClient",
         "filename": "_container_registry_management_client",

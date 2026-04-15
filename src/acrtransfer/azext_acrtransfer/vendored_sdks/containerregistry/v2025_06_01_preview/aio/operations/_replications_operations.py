@@ -21,8 +21,8 @@ from ... import models
 T = TypeVar('T')
 ClsType = Optional[Callable[[PipelineResponse[HttpRequest, AsyncHttpResponse], T, Dict[str, Any]], Any]]
 
-class WebhooksOperations:
-    """WebhooksOperations async operations.
+class ReplicationsOperations:
+    """ReplicationsOperations async operations.
 
     You should not instantiate this class directly. Instead, you should create a Client instance that
     instantiates it for you and attaches it as an attribute.
@@ -47,29 +47,29 @@ class WebhooksOperations:
         self,
         resource_group_name: str,
         registry_name: str,
-        webhook_name: str,
+        replication_name: str,
         **kwargs
-    ) -> "models.Webhook":
-        """Gets the properties of the specified webhook.
+    ) -> "models.Replication":
+        """Gets the properties of the specified replication.
 
         :param resource_group_name: The name of the resource group to which the container registry
          belongs.
         :type resource_group_name: str
         :param registry_name: The name of the container registry.
         :type registry_name: str
-        :param webhook_name: The name of the webhook.
-        :type webhook_name: str
+        :param replication_name: The name of the replication.
+        :type replication_name: str
         :keyword callable cls: A custom type or function that will be passed the direct response
-        :return: Webhook, or the result of cls(response)
-        :rtype: ~azure.mgmt.containerregistry.v2019_12_01_preview.models.Webhook
+        :return: Replication, or the result of cls(response)
+        :rtype: ~azure.mgmt.containerregistry.v2019_12_01_preview.models.Replication
         :raises: ~azure.core.exceptions.HttpResponseError
         """
-        cls = kwargs.pop('cls', None)  # type: ClsType["models.Webhook"]
+        cls = kwargs.pop('cls', None)  # type: ClsType["models.Replication"]
         error_map = {
             401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
         }
         error_map.update(kwargs.pop('error_map', {}))
-        api_version = "2019-12-01-preview"
+        api_version = "2025-06-01-preview"
         accept = "application/json"
 
         # Construct URL
@@ -78,7 +78,7 @@ class WebhooksOperations:
             'subscriptionId': self._serialize.url("self._config.subscription_id", self._config.subscription_id, 'str'),
             'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str', min_length=1),
             'registryName': self._serialize.url("registry_name", registry_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
-            'webhookName': self._serialize.url("webhook_name", webhook_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
+            'replicationName': self._serialize.url("replication_name", replication_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -98,28 +98,28 @@ class WebhooksOperations:
             map_error(status_code=response.status_code, response=response, error_map=error_map)
             raise HttpResponseError(response=response, error_format=ARMErrorFormat)
 
-        deserialized = self._deserialize('Webhook', pipeline_response)
+        deserialized = self._deserialize('Replication', pipeline_response)
 
         if cls:
             return cls(pipeline_response, deserialized, {})
 
         return deserialized
-    get.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks/{webhookName}'}  # type: ignore
+    get.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/replications/{replicationName}'}  # type: ignore
 
     async def _create_initial(
         self,
         resource_group_name: str,
         registry_name: str,
-        webhook_name: str,
-        webhook_create_parameters: "models.WebhookCreateParameters",
+        replication_name: str,
+        replication: "models.Replication",
         **kwargs
-    ) -> "models.Webhook":
-        cls = kwargs.pop('cls', None)  # type: ClsType["models.Webhook"]
+    ) -> "models.Replication":
+        cls = kwargs.pop('cls', None)  # type: ClsType["models.Replication"]
         error_map = {
             401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
         }
         error_map.update(kwargs.pop('error_map', {}))
-        api_version = "2019-12-01-preview"
+        api_version = "2025-06-01-preview"
         content_type = kwargs.pop("content_type", "application/json")
         accept = "application/json"
 
@@ -129,7 +129,7 @@ class WebhooksOperations:
             'subscriptionId': self._serialize.url("self._config.subscription_id", self._config.subscription_id, 'str'),
             'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str', min_length=1),
             'registryName': self._serialize.url("registry_name", registry_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
-            'webhookName': self._serialize.url("webhook_name", webhook_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
+            'replicationName': self._serialize.url("replication_name", replication_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -143,7 +143,7 @@ class WebhooksOperations:
         header_parameters['Accept'] = self._serialize.header("accept", accept, 'str')
 
         body_content_kwargs = {}  # type: Dict[str, Any]
-        body_content = self._serialize.body(webhook_create_parameters, 'WebhookCreateParameters')
+        body_content = self._serialize.body(replication, 'Replication')
         body_content_kwargs['content'] = body_content
         request = self._client.put(url, query_parameters, header_parameters, **body_content_kwargs)
         pipeline_response = await self._client._pipeline.run(request, stream=False, **kwargs)
@@ -154,48 +154,48 @@ class WebhooksOperations:
             raise HttpResponseError(response=response, error_format=ARMErrorFormat)
 
         if response.status_code == 200:
-            deserialized = self._deserialize('Webhook', pipeline_response)
+            deserialized = self._deserialize('Replication', pipeline_response)
 
         if response.status_code == 201:
-            deserialized = self._deserialize('Webhook', pipeline_response)
+            deserialized = self._deserialize('Replication', pipeline_response)
 
         if cls:
             return cls(pipeline_response, deserialized, {})
 
         return deserialized
-    _create_initial.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks/{webhookName}'}  # type: ignore
+    _create_initial.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/replications/{replicationName}'}  # type: ignore
 
     async def begin_create(
         self,
         resource_group_name: str,
         registry_name: str,
-        webhook_name: str,
-        webhook_create_parameters: "models.WebhookCreateParameters",
+        replication_name: str,
+        replication: "models.Replication",
         **kwargs
-    ) -> AsyncLROPoller["models.Webhook"]:
-        """Creates a webhook for a container registry with the specified parameters.
+    ) -> AsyncLROPoller["models.Replication"]:
+        """Creates a replication for a container registry with the specified parameters.
 
         :param resource_group_name: The name of the resource group to which the container registry
          belongs.
         :type resource_group_name: str
         :param registry_name: The name of the container registry.
         :type registry_name: str
-        :param webhook_name: The name of the webhook.
-        :type webhook_name: str
-        :param webhook_create_parameters: The parameters for creating a webhook.
-        :type webhook_create_parameters: ~azure.mgmt.containerregistry.v2019_12_01_preview.models.WebhookCreateParameters
+        :param replication_name: The name of the replication.
+        :type replication_name: str
+        :param replication: The parameters for creating a replication.
+        :type replication: ~azure.mgmt.containerregistry.v2019_12_01_preview.models.Replication
         :keyword callable cls: A custom type or function that will be passed the direct response
         :keyword str continuation_token: A continuation token to restart a poller from a saved state.
         :keyword polling: True for ARMPolling, False for no polling, or a
          polling object for personal polling strategy
         :paramtype polling: bool or ~azure.core.polling.AsyncPollingMethod
         :keyword int polling_interval: Default waiting time between two polls for LRO operations if no Retry-After header is present.
-        :return: An instance of AsyncLROPoller that returns either Webhook or the result of cls(response)
-        :rtype: ~azure.core.polling.AsyncLROPoller[~azure.mgmt.containerregistry.v2019_12_01_preview.models.Webhook]
+        :return: An instance of AsyncLROPoller that returns either Replication or the result of cls(response)
+        :rtype: ~azure.core.polling.AsyncLROPoller[~azure.mgmt.containerregistry.v2019_12_01_preview.models.Replication]
         :raises ~azure.core.exceptions.HttpResponseError:
         """
         polling = kwargs.pop('polling', True)  # type: Union[bool, AsyncPollingMethod]
-        cls = kwargs.pop('cls', None)  # type: ClsType["models.Webhook"]
+        cls = kwargs.pop('cls', None)  # type: ClsType["models.Replication"]
         lro_delay = kwargs.pop(
             'polling_interval',
             self._config.polling_interval
@@ -205,8 +205,8 @@ class WebhooksOperations:
             raw_result = await self._create_initial(
                 resource_group_name=resource_group_name,
                 registry_name=registry_name,
-                webhook_name=webhook_name,
-                webhook_create_parameters=webhook_create_parameters,
+                replication_name=replication_name,
+                replication=replication,
                 cls=lambda x,y,z: x,
                 **kwargs
             )
@@ -215,7 +215,7 @@ class WebhooksOperations:
         kwargs.pop('content_type', None)
 
         def get_long_running_output(pipeline_response):
-            deserialized = self._deserialize('Webhook', pipeline_response)
+            deserialized = self._deserialize('Replication', pipeline_response)
 
             if cls:
                 return cls(pipeline_response, deserialized, {})
@@ -233,13 +233,13 @@ class WebhooksOperations:
             )
         else:
             return AsyncLROPoller(self._client, raw_result, get_long_running_output, polling_method)
-    begin_create.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks/{webhookName}'}  # type: ignore
+    begin_create.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/replications/{replicationName}'}  # type: ignore
 
     async def _delete_initial(
         self,
         resource_group_name: str,
         registry_name: str,
-        webhook_name: str,
+        replication_name: str,
         **kwargs
     ) -> None:
         cls = kwargs.pop('cls', None)  # type: ClsType[None]
@@ -247,7 +247,7 @@ class WebhooksOperations:
             401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
         }
         error_map.update(kwargs.pop('error_map', {}))
-        api_version = "2019-12-01-preview"
+        api_version = "2025-06-01-preview"
 
         # Construct URL
         url = self._delete_initial.metadata['url']  # type: ignore
@@ -255,7 +255,7 @@ class WebhooksOperations:
             'subscriptionId': self._serialize.url("self._config.subscription_id", self._config.subscription_id, 'str'),
             'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str', min_length=1),
             'registryName': self._serialize.url("registry_name", registry_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
-            'webhookName': self._serialize.url("webhook_name", webhook_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
+            'replicationName': self._serialize.url("replication_name", replication_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -277,24 +277,24 @@ class WebhooksOperations:
         if cls:
             return cls(pipeline_response, None, {})
 
-    _delete_initial.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks/{webhookName}'}  # type: ignore
+    _delete_initial.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/replications/{replicationName}'}  # type: ignore
 
     async def begin_delete(
         self,
         resource_group_name: str,
         registry_name: str,
-        webhook_name: str,
+        replication_name: str,
         **kwargs
     ) -> AsyncLROPoller[None]:
-        """Deletes a webhook from a container registry.
+        """Deletes a replication from a container registry.
 
         :param resource_group_name: The name of the resource group to which the container registry
          belongs.
         :type resource_group_name: str
         :param registry_name: The name of the container registry.
         :type registry_name: str
-        :param webhook_name: The name of the webhook.
-        :type webhook_name: str
+        :param replication_name: The name of the replication.
+        :type replication_name: str
         :keyword callable cls: A custom type or function that will be passed the direct response
         :keyword str continuation_token: A continuation token to restart a poller from a saved state.
         :keyword polling: True for ARMPolling, False for no polling, or a
@@ -316,7 +316,7 @@ class WebhooksOperations:
             raw_result = await self._delete_initial(
                 resource_group_name=resource_group_name,
                 registry_name=registry_name,
-                webhook_name=webhook_name,
+                replication_name=replication_name,
                 cls=lambda x,y,z: x,
                 **kwargs
             )
@@ -340,22 +340,22 @@ class WebhooksOperations:
             )
         else:
             return AsyncLROPoller(self._client, raw_result, get_long_running_output, polling_method)
-    begin_delete.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks/{webhookName}'}  # type: ignore
+    begin_delete.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/replications/{replicationName}'}  # type: ignore
 
     async def _update_initial(
         self,
         resource_group_name: str,
         registry_name: str,
-        webhook_name: str,
-        webhook_update_parameters: "models.WebhookUpdateParameters",
+        replication_name: str,
+        replication_update_parameters: "models.ReplicationUpdateParameters",
         **kwargs
-    ) -> "models.Webhook":
-        cls = kwargs.pop('cls', None)  # type: ClsType["models.Webhook"]
+    ) -> "models.Replication":
+        cls = kwargs.pop('cls', None)  # type: ClsType["models.Replication"]
         error_map = {
             401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
         }
         error_map.update(kwargs.pop('error_map', {}))
-        api_version = "2019-12-01-preview"
+        api_version = "2025-06-01-preview"
         content_type = kwargs.pop("content_type", "application/json")
         accept = "application/json"
 
@@ -365,7 +365,7 @@ class WebhooksOperations:
             'subscriptionId': self._serialize.url("self._config.subscription_id", self._config.subscription_id, 'str'),
             'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str', min_length=1),
             'registryName': self._serialize.url("registry_name", registry_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
-            'webhookName': self._serialize.url("webhook_name", webhook_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
+            'replicationName': self._serialize.url("replication_name", replication_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
         }
         url = self._client.format_url(url, **path_format_arguments)
 
@@ -379,7 +379,7 @@ class WebhooksOperations:
         header_parameters['Accept'] = self._serialize.header("accept", accept, 'str')
 
         body_content_kwargs = {}  # type: Dict[str, Any]
-        body_content = self._serialize.body(webhook_update_parameters, 'WebhookUpdateParameters')
+        body_content = self._serialize.body(replication_update_parameters, 'ReplicationUpdateParameters')
         body_content_kwargs['content'] = body_content
         request = self._client.patch(url, query_parameters, header_parameters, **body_content_kwargs)
         pipeline_response = await self._client._pipeline.run(request, stream=False, **kwargs)
@@ -390,48 +390,48 @@ class WebhooksOperations:
             raise HttpResponseError(response=response, error_format=ARMErrorFormat)
 
         if response.status_code == 200:
-            deserialized = self._deserialize('Webhook', pipeline_response)
+            deserialized = self._deserialize('Replication', pipeline_response)
 
         if response.status_code == 201:
-            deserialized = self._deserialize('Webhook', pipeline_response)
+            deserialized = self._deserialize('Replication', pipeline_response)
 
         if cls:
             return cls(pipeline_response, deserialized, {})
 
         return deserialized
-    _update_initial.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks/{webhookName}'}  # type: ignore
+    _update_initial.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/replications/{replicationName}'}  # type: ignore
 
     async def begin_update(
         self,
         resource_group_name: str,
         registry_name: str,
-        webhook_name: str,
-        webhook_update_parameters: "models.WebhookUpdateParameters",
+        replication_name: str,
+        replication_update_parameters: "models.ReplicationUpdateParameters",
         **kwargs
-    ) -> AsyncLROPoller["models.Webhook"]:
-        """Updates a webhook with the specified parameters.
+    ) -> AsyncLROPoller["models.Replication"]:
+        """Updates a replication for a container registry with the specified parameters.
 
         :param resource_group_name: The name of the resource group to which the container registry
          belongs.
         :type resource_group_name: str
         :param registry_name: The name of the container registry.
         :type registry_name: str
-        :param webhook_name: The name of the webhook.
-        :type webhook_name: str
-        :param webhook_update_parameters: The parameters for updating a webhook.
-        :type webhook_update_parameters: ~azure.mgmt.containerregistry.v2019_12_01_preview.models.WebhookUpdateParameters
+        :param replication_name: The name of the replication.
+        :type replication_name: str
+        :param replication_update_parameters: The parameters for updating a replication.
+        :type replication_update_parameters: ~azure.mgmt.containerregistry.v2019_12_01_preview.models.ReplicationUpdateParameters
         :keyword callable cls: A custom type or function that will be passed the direct response
         :keyword str continuation_token: A continuation token to restart a poller from a saved state.
         :keyword polling: True for ARMPolling, False for no polling, or a
          polling object for personal polling strategy
         :paramtype polling: bool or ~azure.core.polling.AsyncPollingMethod
         :keyword int polling_interval: Default waiting time between two polls for LRO operations if no Retry-After header is present.
-        :return: An instance of AsyncLROPoller that returns either Webhook or the result of cls(response)
-        :rtype: ~azure.core.polling.AsyncLROPoller[~azure.mgmt.containerregistry.v2019_12_01_preview.models.Webhook]
+        :return: An instance of AsyncLROPoller that returns either Replication or the result of cls(response)
+        :rtype: ~azure.core.polling.AsyncLROPoller[~azure.mgmt.containerregistry.v2019_12_01_preview.models.Replication]
         :raises ~azure.core.exceptions.HttpResponseError:
         """
         polling = kwargs.pop('polling', True)  # type: Union[bool, AsyncPollingMethod]
-        cls = kwargs.pop('cls', None)  # type: ClsType["models.Webhook"]
+        cls = kwargs.pop('cls', None)  # type: ClsType["models.Replication"]
         lro_delay = kwargs.pop(
             'polling_interval',
             self._config.polling_interval
@@ -441,8 +441,8 @@ class WebhooksOperations:
             raw_result = await self._update_initial(
                 resource_group_name=resource_group_name,
                 registry_name=registry_name,
-                webhook_name=webhook_name,
-                webhook_update_parameters=webhook_update_parameters,
+                replication_name=replication_name,
+                replication_update_parameters=replication_update_parameters,
                 cls=lambda x,y,z: x,
                 **kwargs
             )
@@ -451,7 +451,7 @@ class WebhooksOperations:
         kwargs.pop('content_type', None)
 
         def get_long_running_output(pipeline_response):
-            deserialized = self._deserialize('Webhook', pipeline_response)
+            deserialized = self._deserialize('Replication', pipeline_response)
 
             if cls:
                 return cls(pipeline_response, deserialized, {})
@@ -469,15 +469,15 @@ class WebhooksOperations:
             )
         else:
             return AsyncLROPoller(self._client, raw_result, get_long_running_output, polling_method)
-    begin_update.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks/{webhookName}'}  # type: ignore
+    begin_update.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/replications/{replicationName}'}  # type: ignore
 
     def list(
         self,
         resource_group_name: str,
         registry_name: str,
         **kwargs
-    ) -> AsyncIterable["models.WebhookListResult"]:
-        """Lists all the webhooks for the specified container registry.
+    ) -> AsyncIterable["models.ReplicationListResult"]:
+        """Lists all the replications for the specified container registry.
 
         :param resource_group_name: The name of the resource group to which the container registry
          belongs.
@@ -485,16 +485,16 @@ class WebhooksOperations:
         :param registry_name: The name of the container registry.
         :type registry_name: str
         :keyword callable cls: A custom type or function that will be passed the direct response
-        :return: An iterator like instance of either WebhookListResult or the result of cls(response)
-        :rtype: ~azure.core.async_paging.AsyncItemPaged[~azure.mgmt.containerregistry.v2019_12_01_preview.models.WebhookListResult]
+        :return: An iterator like instance of either ReplicationListResult or the result of cls(response)
+        :rtype: ~azure.core.async_paging.AsyncItemPaged[~azure.mgmt.containerregistry.v2019_12_01_preview.models.ReplicationListResult]
         :raises: ~azure.core.exceptions.HttpResponseError
         """
-        cls = kwargs.pop('cls', None)  # type: ClsType["models.WebhookListResult"]
+        cls = kwargs.pop('cls', None)  # type: ClsType["models.ReplicationListResult"]
         error_map = {
             401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
         }
         error_map.update(kwargs.pop('error_map', {}))
-        api_version = "2019-12-01-preview"
+        api_version = "2025-06-01-preview"
         accept = "application/json"
 
         def prepare_request(next_link=None):
@@ -523,7 +523,7 @@ class WebhooksOperations:
             return request
 
         async def extract_data(pipeline_response):
-            deserialized = self._deserialize('WebhookListResult', pipeline_response)
+            deserialized = self._deserialize('ReplicationListResult', pipeline_response)
             list_of_elem = deserialized.value
             if cls:
                 list_of_elem = cls(list_of_elem)
@@ -544,209 +544,4 @@ class WebhooksOperations:
         return AsyncItemPaged(
             get_next, extract_data
         )
-    list.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks'}  # type: ignore
-
-    async def ping(
-        self,
-        resource_group_name: str,
-        registry_name: str,
-        webhook_name: str,
-        **kwargs
-    ) -> "models.EventInfo":
-        """Triggers a ping event to be sent to the webhook.
-
-        :param resource_group_name: The name of the resource group to which the container registry
-         belongs.
-        :type resource_group_name: str
-        :param registry_name: The name of the container registry.
-        :type registry_name: str
-        :param webhook_name: The name of the webhook.
-        :type webhook_name: str
-        :keyword callable cls: A custom type or function that will be passed the direct response
-        :return: EventInfo, or the result of cls(response)
-        :rtype: ~azure.mgmt.containerregistry.v2019_12_01_preview.models.EventInfo
-        :raises: ~azure.core.exceptions.HttpResponseError
-        """
-        cls = kwargs.pop('cls', None)  # type: ClsType["models.EventInfo"]
-        error_map = {
-            401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
-        }
-        error_map.update(kwargs.pop('error_map', {}))
-        api_version = "2019-12-01-preview"
-        accept = "application/json"
-
-        # Construct URL
-        url = self.ping.metadata['url']  # type: ignore
-        path_format_arguments = {
-            'subscriptionId': self._serialize.url("self._config.subscription_id", self._config.subscription_id, 'str'),
-            'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str', min_length=1),
-            'registryName': self._serialize.url("registry_name", registry_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
-            'webhookName': self._serialize.url("webhook_name", webhook_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
-        }
-        url = self._client.format_url(url, **path_format_arguments)
-
-        # Construct parameters
-        query_parameters = {}  # type: Dict[str, Any]
-        query_parameters['api-version'] = self._serialize.query("api_version", api_version, 'str')
-
-        # Construct headers
-        header_parameters = {}  # type: Dict[str, Any]
-        header_parameters['Accept'] = self._serialize.header("accept", accept, 'str')
-
-        request = self._client.post(url, query_parameters, header_parameters)
-        pipeline_response = await self._client._pipeline.run(request, stream=False, **kwargs)
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
-            raise HttpResponseError(response=response, error_format=ARMErrorFormat)
-
-        deserialized = self._deserialize('EventInfo', pipeline_response)
-
-        if cls:
-            return cls(pipeline_response, deserialized, {})
-
-        return deserialized
-    ping.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks/{webhookName}/ping'}  # type: ignore
-
-    async def get_callback_config(
-        self,
-        resource_group_name: str,
-        registry_name: str,
-        webhook_name: str,
-        **kwargs
-    ) -> "models.CallbackConfig":
-        """Gets the configuration of service URI and custom headers for the webhook.
-
-        :param resource_group_name: The name of the resource group to which the container registry
-         belongs.
-        :type resource_group_name: str
-        :param registry_name: The name of the container registry.
-        :type registry_name: str
-        :param webhook_name: The name of the webhook.
-        :type webhook_name: str
-        :keyword callable cls: A custom type or function that will be passed the direct response
-        :return: CallbackConfig, or the result of cls(response)
-        :rtype: ~azure.mgmt.containerregistry.v2019_12_01_preview.models.CallbackConfig
-        :raises: ~azure.core.exceptions.HttpResponseError
-        """
-        cls = kwargs.pop('cls', None)  # type: ClsType["models.CallbackConfig"]
-        error_map = {
-            401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
-        }
-        error_map.update(kwargs.pop('error_map', {}))
-        api_version = "2019-12-01-preview"
-        accept = "application/json"
-
-        # Construct URL
-        url = self.get_callback_config.metadata['url']  # type: ignore
-        path_format_arguments = {
-            'subscriptionId': self._serialize.url("self._config.subscription_id", self._config.subscription_id, 'str'),
-            'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str', min_length=1),
-            'registryName': self._serialize.url("registry_name", registry_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
-            'webhookName': self._serialize.url("webhook_name", webhook_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
-        }
-        url = self._client.format_url(url, **path_format_arguments)
-
-        # Construct parameters
-        query_parameters = {}  # type: Dict[str, Any]
-        query_parameters['api-version'] = self._serialize.query("api_version", api_version, 'str')
-
-        # Construct headers
-        header_parameters = {}  # type: Dict[str, Any]
-        header_parameters['Accept'] = self._serialize.header("accept", accept, 'str')
-
-        request = self._client.post(url, query_parameters, header_parameters)
-        pipeline_response = await self._client._pipeline.run(request, stream=False, **kwargs)
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200]:
-            map_error(status_code=response.status_code, response=response, error_map=error_map)
-            raise HttpResponseError(response=response, error_format=ARMErrorFormat)
-
-        deserialized = self._deserialize('CallbackConfig', pipeline_response)
-
-        if cls:
-            return cls(pipeline_response, deserialized, {})
-
-        return deserialized
-    get_callback_config.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks/{webhookName}/getCallbackConfig'}  # type: ignore
-
-    def list_events(
-        self,
-        resource_group_name: str,
-        registry_name: str,
-        webhook_name: str,
-        **kwargs
-    ) -> AsyncIterable["models.EventListResult"]:
-        """Lists recent events for the specified webhook.
-
-        :param resource_group_name: The name of the resource group to which the container registry
-         belongs.
-        :type resource_group_name: str
-        :param registry_name: The name of the container registry.
-        :type registry_name: str
-        :param webhook_name: The name of the webhook.
-        :type webhook_name: str
-        :keyword callable cls: A custom type or function that will be passed the direct response
-        :return: An iterator like instance of either EventListResult or the result of cls(response)
-        :rtype: ~azure.core.async_paging.AsyncItemPaged[~azure.mgmt.containerregistry.v2019_12_01_preview.models.EventListResult]
-        :raises: ~azure.core.exceptions.HttpResponseError
-        """
-        cls = kwargs.pop('cls', None)  # type: ClsType["models.EventListResult"]
-        error_map = {
-            401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
-        }
-        error_map.update(kwargs.pop('error_map', {}))
-        api_version = "2019-12-01-preview"
-        accept = "application/json"
-
-        def prepare_request(next_link=None):
-            # Construct headers
-            header_parameters = {}  # type: Dict[str, Any]
-            header_parameters['Accept'] = self._serialize.header("accept", accept, 'str')
-
-            if not next_link:
-                # Construct URL
-                url = self.list_events.metadata['url']  # type: ignore
-                path_format_arguments = {
-                    'subscriptionId': self._serialize.url("self._config.subscription_id", self._config.subscription_id, 'str'),
-                    'resourceGroupName': self._serialize.url("resource_group_name", resource_group_name, 'str', min_length=1),
-                    'registryName': self._serialize.url("registry_name", registry_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
-                    'webhookName': self._serialize.url("webhook_name", webhook_name, 'str', max_length=50, min_length=5, pattern=r'^[a-zA-Z0-9]*$'),
-                }
-                url = self._client.format_url(url, **path_format_arguments)
-                # Construct parameters
-                query_parameters = {}  # type: Dict[str, Any]
-                query_parameters['api-version'] = self._serialize.query("api_version", api_version, 'str')
-
-                request = self._client.post(url, query_parameters, header_parameters)
-            else:
-                url = next_link
-                query_parameters = {}  # type: Dict[str, Any]
-                request = self._client.get(url, query_parameters, header_parameters)
-            return request
-
-        async def extract_data(pipeline_response):
-            deserialized = self._deserialize('EventListResult', pipeline_response)
-            list_of_elem = deserialized.value
-            if cls:
-                list_of_elem = cls(list_of_elem)
-            return deserialized.next_link or None, AsyncList(list_of_elem)
-
-        async def get_next(next_link=None):
-            request = prepare_request(next_link)
-
-            pipeline_response = await self._client._pipeline.run(request, stream=False, **kwargs)
-            response = pipeline_response.http_response
-
-            if response.status_code not in [200]:
-                map_error(status_code=response.status_code, response=response, error_map=error_map)
-                raise HttpResponseError(response=response, error_format=ARMErrorFormat)
-
-            return pipeline_response
-
-        return AsyncItemPaged(
-            get_next, extract_data
-        )
-    list_events.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks/{webhookName}/listEvents'}  # type: ignore
+    list.metadata = {'url': '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/replications'}  # type: ignore
