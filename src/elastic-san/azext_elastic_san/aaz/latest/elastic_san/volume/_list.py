@@ -48,11 +48,6 @@ class List(AAZCommand):
         # define Arg Group ""
 
         _args_schema = cls._args_schema
-        _args_schema.x_ms_access_soft_deleted_resources = AAZStrArg(
-            options=["--x-ms-access-soft-deleted-resources"],
-            help="Optional, returns only soft deleted volumes if set to true. If set to false or if not specified, returns only active volumes.",
-            enum={"false": "false", "true": "true"},
-        )
         _args_schema.elastic_san_name = AAZStrArg(
             options=["-e", "--elastic-san", "--elastic-san-name"],
             help="The name of the ElasticSan.",
@@ -157,9 +152,6 @@ class List(AAZCommand):
         @property
         def header_parameters(self):
             parameters = {
-                **self.serialize_header_param(
-                    "x-ms-access-soft-deleted-resources", self.ctx.args.x_ms_access_soft_deleted_resources,
-                ),
                 **self.serialize_header_param(
                     "Accept", "application/json",
                 ),
